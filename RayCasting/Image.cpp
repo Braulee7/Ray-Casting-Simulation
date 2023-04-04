@@ -1,6 +1,7 @@
 #include "Image.h"
 #include "Ray.h"
 #include "Sphere.h"
+#include <iostream>
 
 
 Image::Image()
@@ -94,10 +95,10 @@ uint32_t Image::fragShader(glm::vec2 coord)
 	Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
 	//sphere object we're going to render
-	Sphere sphere(glm::vec3(0.0f, 0.0f, -5.0f), 0.5f);
+	Sphere sphere(glm::vec3(1.0f, 1.0f, -1.0f), 0.5f);
 
 	if (sphere.hit(ray))
 		return 0xffff00ff;
 	else
-		return 0x00000000;
+		return 0xff0000ff;
 }

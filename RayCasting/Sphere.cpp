@@ -35,9 +35,10 @@ bool Sphere::hit(const Ray r) const
 	glm::vec3 rayDir = r.getDirection();
 	glm::vec3 rayOri = r.getOrigin();
 
+	glm::vec3 oc = rayOri - mCenter;
 	float a = glm::dot(rayDir, rayDir);
-	float b = 2 * glm::dot(rayOri, rayDir);
-	float c = glm::dot(rayOri, rayOri) - (mRadius * mRadius);
+	float b = 2 * glm::dot(oc, rayDir);
+	float c = glm::dot(oc, oc) - (mRadius * mRadius);
 
 	float discriminant = (b * b) - 4 * a * c;
 	return discriminant >= 0;
