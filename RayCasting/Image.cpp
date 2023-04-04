@@ -50,6 +50,7 @@ void Image::InitTexture()
 
 void Image::Render()
 {
+	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
 
 	//clear data
@@ -68,8 +69,10 @@ void Image::Render()
 	//show the image to the renderer
 	SDL_UpdateTexture(mTexture, nullptr, mImageData, mWidth * sizeof(Uint32));
 
+	//clear the image buffer
 	delete[] mImageData;
 
+	//present the image to the screen
 	SDL_Rect src, bound;
 	src.x = 0;
 	src.y = 0;
@@ -80,6 +83,7 @@ void Image::Render()
 	
 }
 
+//meant return a color for each pixel on the screen
 uint32_t Image::fragShader(glm::vec2 coord)
 {
 	uint8_t r = (uint8_t)(coord.x * 255.0f);
