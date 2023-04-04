@@ -1,4 +1,7 @@
 #include "Image.h"
+#include "Ray.h"
+#include "Sphere.h"
+
 
 Image::Image()
 {
@@ -62,6 +65,7 @@ void Image::Render()
 
 			//get coordinate of individual pixel
 			glm::vec2 coord = { (float) x / (float) mWidth, (float) y / (float) mHeight };
+			coord = coord * 2.0f - 1.0f;
 			mImageData[x + y * mWidth] = fragShader(coord);
 		}
 	}
@@ -86,8 +90,14 @@ void Image::Render()
 //meant return a color for each pixel on the screen
 uint32_t Image::fragShader(glm::vec2 coord)
 {
-	uint8_t r = (uint8_t)(coord.x * 255.0f);
-	uint8_t g = (uint8_t)(coord.y * 255.0f);
+	//shoot a ray from the screen torward the pixel
+	Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
-	return 0xff000000 | (g << 8) | (r << 16);
+	//sphere object we're going to render
+	Sphere sphere(glm::vec3(0.0f, 0.0f, -5.0f), 0.5f);
+
+	if (sphere.hit(ray))
+		return 0xffff00ff;
+	else
+		return 0x00000000;
 }
