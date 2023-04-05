@@ -11,7 +11,7 @@ public:
 	float getY() const;
 	float getZ() const;
 	float radius() const;
-	bool hit(const Ray r) const;
+	uint32_t hit(const Ray r) const;
 private:
 	glm::vec3 mCenter;
 	float mRadius;

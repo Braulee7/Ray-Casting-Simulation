@@ -97,8 +97,5 @@ uint32_t Image::fragShader(glm::vec2 coord)
 	//sphere object we're going to render
 	Sphere sphere(glm::vec3(1.0f, 1.0f, -1.0f), 0.5f);
 
-	if (sphere.hit(ray))
-		return 0xffff00ff;
-	else
-		return 0xff0000ff;
+	return sphere.hit(ray);
 }
