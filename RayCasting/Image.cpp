@@ -2,6 +2,9 @@
 #include "Ray.h"
 #include "Sphere.h"
 #include <iostream>
+#include <cmath>
+#include <limits>
+
 
 
 Image::Image()
@@ -97,5 +100,10 @@ uint32_t Image::fragShader(glm::vec2 coord)
 	//sphere object we're going to render
 	Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
 
-	return sphere.hit(ray);
+	hitRecord rec;
+
+	if (sphere.hit(ray, 0, std::numeric_limits<float>::infinity(), rec))
+		return 0xffff00ff;
+	else
+		return 0xff000000;
 }

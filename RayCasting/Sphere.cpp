@@ -29,11 +29,8 @@ float Sphere::radius() const
 	return mRadius;
 }
 
-uint32_t Sphere::hit(const Ray r) const
+bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) const
 {
-	//(bx^2 + by^2 + bz^2)t^2 + (2(axbx + ayby azbz))t + (ax^2 + ay^2 + az^2 - r^2)
-	//         a                         b                           c
-	
 	glm::vec3 rayDir = r.getDirection();
 	glm::vec3 rayOri = r.getOrigin();
 
@@ -44,17 +41,24 @@ uint32_t Sphere::hit(const Ray r) const
 
 	float discriminant = (halfB * halfB) - a * c;
 
-	if (discriminant < 0)
-		return 0xff000000;
-	//Calculate the Normal
-
-	//std::cout << "calculating normal" << std::endl;
-
+	if (discriminant < 0) return false;
 
 	float t = (-halfB - std::sqrt(discriminant)) / (a);
-	glm::vec3 pointOfIntersection = r.at(t);
-	glm::vec3 normal = pointOfIntersection - mCenter;
-	normal =glm::normalize(normal);
+
+	if (t < tMin || tMax < t) {
+		t = (-halfB - std::sqrt(discriminant)) / a;
+		if (t < tMin || tMax < t)
+			return false;
+	}
+
+	rec.t = t;
+	rec.p = r.at(t);
+	rec.normal = (rec.p - mCenter) / mRadius;
+
+	return true;
+}
+/*
+{
 
 	//get channels
 	uint8_t red		= (uint8_t)(0.5 * ((normal.x + 1) * 255.999f));
@@ -63,3 +67,4 @@ uint32_t Sphere::hit(const Ray r) const
 
 	return 0xff000000 | (red << 16) | (green << 8) | (blue);
 }
+*/
