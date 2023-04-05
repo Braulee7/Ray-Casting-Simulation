@@ -1,4 +1,5 @@
 #include "Ray.h"
+#include <iostream>
 
 Ray::Ray(glm::vec3 origin, glm::vec3 direction)
 {
@@ -19,11 +20,10 @@ glm::vec3 Ray::getDirection() const
 
 glm::vec3 Ray::at(float t) const
 {
-	//t is a 1D object so we need to 
-	//convert it to a vector to use in 
-	//equation
-	glm::vec3 T = glm::vec3(t);
-
-	// a + bt
-	return mOrigin + mDirection * T;
+	//since t is a scalar, we need to multiply each of 
+	//the coords with t to get bt
+	glm::vec3 val = glm::vec3(mDirection.x * t, mDirection.y * t, mDirection.z * t);
+	
+	//a + bt
+	return mOrigin + val;
 }

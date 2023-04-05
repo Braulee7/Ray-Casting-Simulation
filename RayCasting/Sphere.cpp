@@ -1,4 +1,6 @@
 #include "Sphere.h"
+#include <math.h>
+#include <iostream>
 
 
 Sphere::Sphere(glm::vec3 center, float radius)
@@ -46,14 +48,18 @@ uint32_t Sphere::hit(const Ray r) const
 		return 0xff000000;
 	//Calculate the Normal
 
-	float t = (-halfB - discriminant) / a;
+	//std::cout << "calculating normal" << std::endl;
+
+
+	float t = (-halfB - std::sqrt(discriminant)) / (a);
 	glm::vec3 pointOfIntersection = r.at(t);
 	glm::vec3 normal = pointOfIntersection - mCenter;
+	normal =glm::normalize(normal);
 
 	//get channels
-	uint8_t red = (uint8_t) normal.x;
-	uint8_t green = (uint8_t)normal.y;
-	uint8_t blue = (uint8_t)normal.z;
+	uint8_t red		= (uint8_t)(0.5 * ((normal.x + 1) * 255.999f));
+	uint8_t green	= (uint8_t)(0.5 * ((normal.y + 1) * 255.999f));
+	uint8_t blue	= (uint8_t)(0.5 * ((normal.z + 1) * 255.999f));
 
-	return 0xff000000 | (red << 16) | (green << 8) | blue;
+	return 0xff000000 | (red << 16) | (green << 8) | (blue);
 }
