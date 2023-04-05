@@ -8,6 +8,9 @@ struct hitRecord {
 	glm::vec3 p;
 	glm::vec3 normal;
 	float t;
+	bool faceNormal;
+
+	void setNormal(const Ray& r, const glm::vec3& outwardNormal);
 };
 
 class Hittable {

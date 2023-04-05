@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <glm.hpp>
+#include "HittableList.h"
 
 class Image {
 public:
@@ -12,7 +13,7 @@ public:
 	~Image();
 
 	void Init(const int x, const int y, SDL_Renderer* renderer);
-	void Render();
+	void Render(HittableList &scene);
 	void InitTexture();
 
 
@@ -27,7 +28,7 @@ private:
 	SDL_Texture* mTexture;
 
 	//gpu rendering TODO
-	uint32_t fragShader(glm::vec2 coord);
+	uint32_t fragShader(glm::vec2 coord, HittableList &scene);
 
 };
 

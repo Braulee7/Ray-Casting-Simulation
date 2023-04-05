@@ -1,10 +1,10 @@
-#include "Image.h"
-#include "Ray.h"
-#include "Sphere.h"
 #include <iostream>
 #include <cmath>
 #include <limits>
-
+#include "Image.h"
+#include "Ray.h"
+#include "Sphere.h"
+#include "HittableList.h"
 
 
 Image::Image()
@@ -55,7 +55,7 @@ void Image::InitTexture()
 	SDL_FreeSurface(tempSurface);
 }
 
-void Image::Render()
+void Image::Render(HittableList &scene)
 {
 	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
@@ -70,7 +70,7 @@ void Image::Render()
 			//get coordinate of individual pixel
 			glm::vec2 coord = { (float) x / (float) mWidth, (float) y / (float) mHeight };
 			coord = coord * 2.0f - 1.0f;
-			mImageData[x + y * mWidth] = fragShader(coord);
+			mImageData[x + y * mWidth] = fragShader(coord, scene);
 		}
 	}
 
@@ -87,23 +87,36 @@ void Image::Render()
 	src.w = mWidth;
 	src.h = mHeight;
 	bound = src;
-	SDL_RenderCopy(mRenderer, mTexture, &src, &bound);
+	SDL_RenderCopyEx(mRenderer, mTexture, &src, &bound, 0, NULL,  SDL_FLIP_VERTICAL);
 	
 }
 
 //meant return a color for each pixel on the screen
-uint32_t Image::fragShader(glm::vec2 coord)
+uint32_t Image::fragShader(glm::vec2 coord, HittableList& scene)
 {
 	//shoot a ray from the screen torward the pixel
 	Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
-	//sphere object we're going to render
-	Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
-
 	hitRecord rec;
 
-	if (sphere.hit(ray, 0, std::numeric_limits<float>::infinity(), rec))
-		return 0xffff00ff;
-	else
-		return 0xff000000;
+	if (scene.hit(ray, 0, std::numeric_limits<float>::infinity(), rec)) {
+		uint8_t red   =	(uint8_t)	(0.5 * ((rec.normal.x + 1) * 255.999f));
+		uint8_t green = (uint8_t)	(0.5 * ((rec.normal.y + 1) * 255.999f));
+		uint8_t blue  =	(uint8_t)	(0.5 * ((rec.normal.z + 1) * 255.999f));
+
+		return 0xff000000 | (red << 16) | (green << 8) | (blue);
+	}
+	else {
+		glm::vec3 dir = ray.getDirection();
+
+		auto unitDir = (dir) / glm::length(dir);
+		float t = 0.5 * (unitDir.y + 1);
+
+		uint8_t red	  =	(uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (0.5 * 255.999f));
+		uint8_t green = (uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (0.7 * 255.999f));
+		uint8_t blue  =	(uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (1.0 * 255.999f));
+
+		return 0xff000000 | (red << 16) | (green << 8) | (blue);
+
+	}
 }

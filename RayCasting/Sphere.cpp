@@ -1,7 +1,7 @@
-#include "Sphere.h"
 #include <math.h>
 #include <iostream>
-
+#include "Sphere.h"
+#include "Hittable.h"
 
 Sphere::Sphere(glm::vec3 center, float radius)
 {
@@ -53,7 +53,8 @@ bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) con
 
 	rec.t = t;
 	rec.p = r.at(t);
-	rec.normal = (rec.p - mCenter) / mRadius;
+	glm::vec3 outwardNormal = (rec.p - mCenter) / mRadius;
+	rec.setNormal(r, outwardNormal);
 
 	return true;
 }

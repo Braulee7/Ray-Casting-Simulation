@@ -1,3 +1,4 @@
+#include <memory>
 #include "Application.h"
 
 App::App()
@@ -71,7 +72,11 @@ void App::Render()
 	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(mRenderer);
 
-	mImg.Render();
+	HittableList scene(std::make_shared<Sphere>(glm::vec3(0, 0, -1), 0.5));
+	scene.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100));
+
+
+	mImg.Render(scene);
 
 	SDL_RenderPresent(mRenderer);
 }
