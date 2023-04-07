@@ -18,8 +18,6 @@ private:
 	glm::vec3 horizontal;
 	glm::vec3 vertical;
 
-
-
 };
 
 
