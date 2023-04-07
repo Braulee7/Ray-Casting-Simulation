@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "Image.h"
 
+
 class App {
 public:
 	App();
@@ -22,6 +23,9 @@ private:
 	void Loop();
 	void Event(SDL_Event* event);
 	void Render();
+
+	Camera mCam;
+	bool mLeftClick;
 
 };
 

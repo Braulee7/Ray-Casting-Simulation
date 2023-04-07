@@ -1,7 +1,10 @@
 #include <memory>
+#include <iostream>
+#include <stdlib.h>
 #include "Application.h"
 
 App::App()
+	: mCam(glm::vec3(0, 0, 2), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0), 90, (float)16 / 9)
 {
 	mRunning = true;
 	mWindow = nullptr;
@@ -22,13 +25,13 @@ int App::Init()
 		return 0;
 	}
 
-	mWindow = SDL_CreateWindow("Braulee RayTracing", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, SDL_WINDOW_SHOWN);
+	mWindow = SDL_CreateWindow("Braulee RayTracing", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_SHOWN);
 
 	if (mWindow) {
 		//successfully created
 		mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
 
-		mImg.Init(1000, 1000, mRenderer);
+		mImg.Init(1280, 720, mRenderer);
 
 	}
 	else {
@@ -45,13 +48,25 @@ int App::Run()
 	if (!Init())
 		return 0;
 
+	
+
 	while (mRunning) {
+		Uint32 start = SDL_GetPerformanceCounter();
+		
 		while (SDL_PollEvent(&event) != 0) {
 			Event(&event);
 		}
 
 		Loop();
 		Render();
+
+		Uint32 end = SDL_GetPerformanceCounter();
+
+		float fps = (end - start) / (float) SDL_GetPerformanceFrequency();
+		
+		system("cls");
+		std::cerr << "FPS: " << 1.0f / fps << std::fflush;
+		
 	}
 
 	return 1;
@@ -63,8 +78,14 @@ void App::Loop()
 
 void App::Event(SDL_Event* event)
 {
-	if (event->type == SDL_QUIT)
+
+	switch (event->type) {
+	
+	case SDL_QUIT:
 		mRunning = false;
+		break;
+	}
+
 }
 
 void App::Render()
@@ -76,7 +97,7 @@ void App::Render()
 	scene.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100));
 
 
-	mImg.Render(scene);
+	mImg.Render(scene, mCam);
 
 	SDL_RenderPresent(mRenderer);
 }

@@ -5,6 +5,7 @@
 #include "Ray.h"
 #include "Sphere.h"
 #include "HittableList.h"
+#include "Camera.h"
 
 
 Image::Image()
@@ -55,13 +56,14 @@ void Image::InitTexture()
 	SDL_FreeSurface(tempSurface);
 }
 
-void Image::Render(HittableList &scene)
+void Image::Render(HittableList &scene, Camera cam)
 {
 	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
 
 	//clear data
 	memset(mImageData, 0, mHeight * mWidth * sizeof(uint32_t));
+
 
 	//for each pixel of the image send it to our "frag shader"
 	for (uint32_t y = 0; y < mHeight; y++) {
@@ -70,7 +72,10 @@ void Image::Render(HittableList &scene)
 			//get coordinate of individual pixel
 			glm::vec2 coord = { (float) x / (float) mWidth, (float) y / (float) mHeight };
 			coord = coord * 2.0f - 1.0f;
-			mImageData[x + y * mWidth] = fragShader(coord, scene);
+
+			Ray ray = cam.ray(coord.x, coord.y);
+
+			mImageData[x + y * mWidth] = fragShader(ray, scene);
 		}
 	}
 
@@ -92,10 +97,10 @@ void Image::Render(HittableList &scene)
 }
 
 //meant return a color for each pixel on the screen
-uint32_t Image::fragShader(glm::vec2 coord, HittableList& scene)
+uint32_t Image::fragShader(Ray ray, HittableList& scene)
 {
 	//shoot a ray from the screen torward the pixel
-	Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
+	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
 	hitRecord rec;
 
