@@ -56,7 +56,7 @@ void Image::InitTexture()
 	SDL_FreeSurface(tempSurface);
 }
 
-void Image::Render(HittableList &scene, Camera cam)
+void Image::Render(HittableList &scene, Camera &cam)
 {
 	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
@@ -97,7 +97,7 @@ void Image::Render(HittableList &scene, Camera cam)
 }
 
 //meant return a color for each pixel on the screen
-uint32_t Image::fragShader(Ray ray, HittableList& scene)
+uint32_t Image::fragShader(Ray &ray, HittableList& scene)
 {
 	//shoot a ray from the screen torward the pixel
 	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));

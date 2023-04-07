@@ -11,7 +11,7 @@ bool Hittable::hit(const Ray& r, float tMin, float tMax, hitRecord& rec) const
 	return false;
 }
 
-void Hittable::setColor(glm::vec3 color) {
+void Hittable::setColor(glm::vec3& color) {
 	mMat.setColor(color);
 }
 

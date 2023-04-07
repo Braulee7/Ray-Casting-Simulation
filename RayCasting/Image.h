@@ -14,7 +14,7 @@ public:
 	~Image();
 
 	void Init(const int x, const int y, SDL_Renderer* renderer);
-	void Render(HittableList &scene, Camera cam);
+	void Render(HittableList &scene, Camera &cam);
 	void InitTexture();
 
 
@@ -29,7 +29,7 @@ private:
 	SDL_Texture* mTexture;
 
 	//gpu rendering TODO
-	uint32_t fragShader(Ray ray, HittableList &scene);
+	uint32_t fragShader(Ray &ray, HittableList &scene);
 
 };
 

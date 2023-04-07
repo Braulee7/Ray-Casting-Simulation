@@ -3,7 +3,7 @@
 #include "Sphere.h"
 #include "Hittable.h"
 
-Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 color)
+Sphere::Sphere(glm::vec3& center, float radius, glm::vec3& color)
 {
 	mCenter = center;
 	mRadius = radius;

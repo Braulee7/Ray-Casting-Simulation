@@ -7,9 +7,9 @@
 class Material {
 public:
 	Material() : mColor(0) {};
-	Material(glm::vec3 color);
+	Material(glm::vec3& color);
 	uint32_t getColor();
-	void setColor(glm::vec3 color);
+	void setColor(glm::vec3& color);
 
 private:
 	glm::vec3 mColor;

@@ -14,14 +14,14 @@ struct hitRecord {
 
 	void setNormal(const Ray& r, const glm::vec3& outwardNormal);
 
-	inline hitRecord() : p(0), normal(0), mat(glm::vec3(0)), t(0), faceNormal(false) {};
+	inline hitRecord() : p(0), normal(0), mat(), t(0), faceNormal(false) {};
 };
 
 class Hittable {
 public:
 	Hittable() = default;
 	virtual bool hit(const Ray& r, float t_min, float t_max, hitRecord& rec) const = 0;
-	virtual void setColor(glm::vec3 color);
+	virtual void setColor(glm::vec3& color);
 	Material mMat;
 };
 

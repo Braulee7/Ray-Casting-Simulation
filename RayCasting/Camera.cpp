@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up, float fov, float aspectRatio)
+Camera::Camera(glm::vec3& pos, glm::vec3& front, glm::vec3& up, float fov, float aspectRatio)
 	:mOrigin(pos)
 {
 	float theta = glm::radians(fov);

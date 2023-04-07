@@ -1,6 +1,6 @@
 #include "Material.h"
 
-Material::Material(glm::vec3 color)
+Material::Material(glm::vec3& color)
 	:mColor(color)
 {
 }
@@ -14,7 +14,7 @@ uint32_t Material::getColor()
 	return 0xff000000 | (r << 16) | (g << 8) | (b);
 }
 
-void Material::setColor(glm::vec3 color)
+void Material::setColor(glm::vec3& color)
 {
 	mColor = color;
 }

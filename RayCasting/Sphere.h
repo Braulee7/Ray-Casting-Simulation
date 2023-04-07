@@ -8,7 +8,7 @@
 
 class Sphere : public Hittable{
 public:
-	Sphere(glm::vec3 center, float radius, glm::vec3 color);
+	Sphere(glm::vec3& center, float radius, glm::vec3& color);
 	float getX() const;
 	float getY() const;
 	float getZ() const;
