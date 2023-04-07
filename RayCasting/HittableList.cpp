@@ -1,10 +1,10 @@
 #include "HittableList.h"
 
-HittableList::HittableList(std::shared_ptr<Sphere> object){
+HittableList::HittableList(std::shared_ptr<Hittable> object){
 	add(object);
 }
 
-void HittableList::add(std::shared_ptr<Sphere> object) {
+void HittableList::add(std::shared_ptr<Hittable> object) {
 	mObjects.push_back(object);
 }
 

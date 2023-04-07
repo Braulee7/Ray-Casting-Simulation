@@ -93,8 +93,9 @@ void App::Render()
 	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(mRenderer);
 
-	HittableList scene(std::make_shared<Sphere>(glm::vec3(0, 0, -1), 0.5));
-	scene.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100));
+	HittableList scene(std::make_shared<Sphere>(glm::vec3(0, 0, -1), 0.5, glm::vec3(200, 0, 200)));
+	scene.add(std::make_shared<Sphere>(glm::vec3(0, -100.5, -1), 100, glm::vec3(0, 255, 0)));
+	scene.add(std::make_shared<Sphere>(glm::vec3(-1, 0, 0), 0.5, glm::vec3(125, 32, 126)));
 
 
 	mImg.Render(scene, mCam);

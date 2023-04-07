@@ -3,10 +3,11 @@
 #include "Sphere.h"
 #include "Hittable.h"
 
-Sphere::Sphere(glm::vec3 center, float radius)
+Sphere::Sphere(glm::vec3 center, float radius, glm::vec3 color)
 {
 	mCenter = center;
 	mRadius = radius;
+	setColor(color);
 }
 
 float Sphere::getX() const
@@ -53,6 +54,7 @@ bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) con
 
 	rec.t = t;
 	rec.p = r.at(t);
+	rec.mat = mMat;
 	glm::vec3 outwardNormal = (rec.p - mCenter) / mRadius;
 	rec.setNormal(r, outwardNormal);
 

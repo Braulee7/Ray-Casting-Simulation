@@ -5,9 +5,10 @@
 #include "Ray.h"
 #include "Hittable.h"
 
+
 class Sphere : public Hittable{
 public:
-	Sphere(glm::vec3 center, float radius);
+	Sphere(glm::vec3 center, float radius, glm::vec3 color);
 	float getX() const;
 	float getY() const;
 	float getZ() const;

@@ -105,11 +105,7 @@ uint32_t Image::fragShader(Ray ray, HittableList& scene)
 	hitRecord rec;
 
 	if (scene.hit(ray, 0, std::numeric_limits<float>::infinity(), rec)) {
-		uint8_t red   =	(uint8_t)	(0.5 * ((rec.normal.x + 1) * 255.999f));
-		uint8_t green = (uint8_t)	(0.5 * ((rec.normal.y + 1) * 255.999f));
-		uint8_t blue  =	(uint8_t)	(0.5 * ((rec.normal.z + 1) * 255.999f));
-
-		return 0xff000000 | (red << 16) | (green << 8) | (blue);
+		return rec.mat.getColor();
 	}
 	else {
 		glm::vec3 dir = ray.getDirection();
