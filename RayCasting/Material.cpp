@@ -14,6 +14,10 @@ uint32_t Material::getColor()
 	return 0xff000000 | (r << 16) | (g << 8) | (b);
 }
 
+glm::vec3 Material::colorVec() {
+	return mColor;
+}
+
 void Material::setColor(glm::vec3& color)
 {
 	mColor = color;

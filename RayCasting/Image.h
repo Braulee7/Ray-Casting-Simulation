@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <glm.hpp>
+#include <random>
 #include "HittableList.h"
 #include "Camera.h"
 
@@ -29,7 +30,7 @@ private:
 	SDL_Texture* mTexture;
 
 	//gpu rendering TODO
-	uint32_t fragShader(Ray &ray, HittableList &scene);
+	glm::vec3 fragShader(Ray &ray, HittableList &scene);
 
 };
 
