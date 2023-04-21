@@ -6,7 +6,7 @@
 #include "Sphere.h"
 #include "Hittable.h"
 
-class HittableList : Hittable {
+class HittableList : public Hittable {
 public:
 	HittableList(std::shared_ptr<Hittable> object);
 	void add(std::shared_ptr<Hittable> object);

@@ -21,7 +21,7 @@ class Hittable {
 public:
 	Hittable() = default;
 	virtual bool hit(const Ray& r, float t_min, float t_max, hitRecord& rec) const = 0;
-	virtual void setColor(glm::vec3& color);
+	void setColor(glm::vec3& color);
 	Material mMat;
 };
 
