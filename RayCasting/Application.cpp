@@ -4,6 +4,7 @@
 #include "Application.h"
 
 App::App()
+	:scene()
 {
 	glm::vec3 pos = glm::vec3(0, 0, 2);
 	glm::vec3 front = glm::vec3(0, 0, -1);
@@ -35,6 +36,19 @@ int App::Init()
 		mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
 
 		mImg.Init(1280, 720, mRenderer);
+
+		//create the scene
+		glm::vec3 origin = glm::vec3(0, 0, -1);
+		glm::vec3 color = glm::vec3(245, 142, 224);
+		scene.add(std::make_shared<Sphere>(origin, 0.5, color));
+
+		origin.y = -100.5;
+		color.x = 0; color.y = 255; color.z = 0;
+		scene.add(std::make_shared<Sphere>(origin, 100, color));
+
+		origin.x = -2; origin.y = 0; origin.z = 0;
+		color.x = 117; color.y = 205; color.z = 235;
+		scene.add(std::make_shared<Sphere>(origin, 0.5, color));
 
 	}
 	else {
@@ -95,18 +109,6 @@ void App::Render()
 {
 	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(mRenderer);
-
-	glm::vec3 origin = glm::vec3(0, 0, -1);
-	glm::vec3 color = glm::vec3(200, 0, 200);
-	HittableList scene(std::make_shared<Sphere>(origin, 0.5, color));
-	
-	origin.y = -100.5;
-	color.x = 0; color.y = 255; color.z = 0;
-	scene.add(std::make_shared<Sphere>(origin, 100, color));
-
-	origin.x = -2; origin.y = 0; origin.z = 0;
-	color.x = 125; color.y = 125; color.z = 32;
-	scene.add(std::make_shared<Sphere>(origin, 0.5, color));
 
 
 	mImg.Render(scene, mCam);

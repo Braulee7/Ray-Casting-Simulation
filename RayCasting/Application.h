@@ -17,6 +17,7 @@ private:
 	bool mRunning;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
+	HittableList scene;
 	
 private:
 	int Init();
@@ -25,7 +26,6 @@ private:
 	void Render();
 
 	Camera mCam;
-	bool mLeftClick;
 
 };
 

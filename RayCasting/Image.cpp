@@ -64,7 +64,7 @@ void Image::Render(HittableList &scene, Camera &cam)
 
 	//clear data
 	memset(mImageData, 0, mHeight * mWidth * sizeof(uint32_t));
-	int pSamples = 1;
+	int pSamples = 5;
 	glm::vec3 col(0);
 
 	//for each pixel of the image send it to our "frag shader"
@@ -118,30 +118,16 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 		if (scene.hit(ray, 0.00001, std::numeric_limits<float>::infinity(), rec)) {
 			Material mat = rec.mat;
 			col *= mat.colorVec();
-
+			
 			//reshoot ray from point of intersection (diffuse light)
 			srand((unsigned int)(ray.getOrigin().x + ray.getOrigin().y));
-			glm::vec3 target = rec.p + rec.normal + glm::vec3((float)(rand() % (RAND_MAX + 1)), (float)(rand() % (RAND_MAX + 1)),(float)(rand() % (RAND_MAX + 1)));
+			glm::vec3 target = rec.p + BU::Hemisphere(rec.normal);
 			ray = Ray(rec.p, target - rec.p);
 		}
 		else {
 			break;
-
-			glm::vec3 dir = ray.getDirection();
-
-			auto unitDir = (dir) / glm::length(dir);
-			float t = 0.5 * (unitDir.y + 1);
-
-			uint8_t red = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (0.5 * 255.999f));
-			uint8_t green = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (0.7 * 255.999f));
-			uint8_t blue = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (1.0 * 255.999f));
-
-			glm::vec3 sorround = glm::vec3((float)red, (float)green, (float)blue);
-
-			col *= sorround;
 		}
 	}
-
 	return col;
 
 }
