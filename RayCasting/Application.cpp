@@ -66,23 +66,23 @@ int App::Run()
 		return 0;
 
 	
+	Uint64 curr = SDL_GetPerformanceCounter();
+	Uint64 last = 0;
+	double delta = 0;
 
 	while (mRunning) {
-		Uint32 start = SDL_GetPerformanceCounter();
-		
+		last = curr;
+		curr = SDL_GetPerformanceCounter();
+		delta = (double)((curr - last) * 1000 / (double)SDL_GetPerformanceFrequency());
 		while (SDL_PollEvent(&event) != 0) {
 			Event(&event);
 		}
 
 		Loop();
 		Render();
-
-		Uint32 end = SDL_GetPerformanceCounter();
-
-		float fps = (end - start) / (float) SDL_GetPerformanceFrequency();
 		
 		system("cls");
-		std::cerr << "FPS: " << 1.0f / fps << std::fflush;
+		std::cerr << "Time since last render: " << delta << "ms" << std::endl;
 		
 	}
 
