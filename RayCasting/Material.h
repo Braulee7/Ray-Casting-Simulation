@@ -9,10 +9,12 @@ public:
 	Material() : mColor(0) {};
 	Material(glm::vec3& color);
 	uint32_t getColor();
+	glm::vec3 colorVec();
 	void setColor(glm::vec3& color);
 
 private:
 	glm::vec3 mColor;
+
 };
 
 #endif // !MATERIAL_H

@@ -6,6 +6,7 @@
 #include "Sphere.h"
 #include "HittableList.h"
 #include "Camera.h"
+#include "Util.h"
 
 
 Image::Image()
@@ -63,19 +64,26 @@ void Image::Render(HittableList &scene, Camera &cam)
 
 	//clear data
 	memset(mImageData, 0, mHeight * mWidth * sizeof(uint32_t));
-
+	int pSamples = 1;
+	glm::vec3 col(0);
 
 	//for each pixel of the image send it to our "frag shader"
 	for (uint32_t y = 0; y < mHeight; y++) {
 		for (uint32_t x = 0; x < mWidth; x++) {
+			//get pixel averages
+			for (int i = 0; i < pSamples; i++)
+			{
+				//get coordinate of individual pixel
+				glm::vec2 coord = { (float)x / (float)mWidth, (float)y / (float)mHeight };
+				coord = coord * 2.0f - 1.0f;
 
-			//get coordinate of individual pixel
-			glm::vec2 coord = { (float) x / (float) mWidth, (float) y / (float) mHeight };
-			coord = coord * 2.0f - 1.0f;
+				Ray ray = cam.ray(coord.x, coord.y);
 
-			Ray ray = cam.ray(coord.x, coord.y);
+				col = fragShader(ray, scene);
+			}
 
-			mImageData[x + y * mWidth] = fragShader(ray, scene);
+			//put the pixel average into the image
+			mImageData[x + y * mWidth] = BU::Color(col, pSamples);
 		}
 	}
 
@@ -97,27 +105,43 @@ void Image::Render(HittableList &scene, Camera &cam)
 }
 
 //meant return a color for each pixel on the screen
-uint32_t Image::fragShader(Ray &ray, HittableList& scene)
+glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 {
 	//shoot a ray from the screen torward the pixel
 	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
 	hitRecord rec;
+	glm::vec3 col = glm::vec3(1);
 
-	if (scene.hit(ray, 0, std::numeric_limits<float>::infinity(), rec)) {
-		return rec.mat.getColor();
+	for (int i = 0; i < 50; i++)
+	{
+		if (scene.hit(ray, 0.00001, std::numeric_limits<float>::infinity(), rec)) {
+			Material mat = rec.mat;
+			col *= mat.colorVec();
+
+			//reshoot ray from point of intersection (diffuse light)
+			srand((unsigned int)(ray.getOrigin().x + ray.getOrigin().y));
+			glm::vec3 target = rec.p + rec.normal + glm::vec3((float)(rand() % (RAND_MAX + 1)), (float)(rand() % (RAND_MAX + 1)),(float)(rand() % (RAND_MAX + 1)));
+			ray = Ray(rec.p, target - rec.p);
+		}
+		else {
+			break;
+
+			glm::vec3 dir = ray.getDirection();
+
+			auto unitDir = (dir) / glm::length(dir);
+			float t = 0.5 * (unitDir.y + 1);
+
+			uint8_t red = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (0.5 * 255.999f));
+			uint8_t green = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (0.7 * 255.999f));
+			uint8_t blue = (uint8_t)((1 - t) * (1 * 255.999f)) + ((t) * (1.0 * 255.999f));
+
+			glm::vec3 sorround = glm::vec3((float)red, (float)green, (float)blue);
+
+			col *= sorround;
+		}
 	}
-	else {
-		glm::vec3 dir = ray.getDirection();
 
-		auto unitDir = (dir) / glm::length(dir);
-		float t = 0.5 * (unitDir.y + 1);
+	return col;
 
-		uint8_t red	  =	(uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (0.5 * 255.999f));
-		uint8_t green = (uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (0.7 * 255.999f));
-		uint8_t blue  =	(uint8_t)	((1 - t) * (1 * 255.999f)) + ((t) * (1.0 * 255.999f));
-
-		return 0xff000000 | (red << 16) | (green << 8) | (blue);
-
-	}
 }
