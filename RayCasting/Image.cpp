@@ -111,8 +111,8 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
 	hitRecord rec;				//holds our collision info
-	glm::vec3 col(1);			//final color of the pixel
-	glm::vec3 lightDir(-1);		//direction of incoming lightsource
+	glm::vec3 col(0);			//final color of the pixel
+	glm::vec3 lightDir(-10);		//direction of incoming lightsource
 	lightDir = glm::normalize(lightDir);
 	float multiplier = 1.0f;
 
@@ -127,15 +127,15 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 			float intensity = glm::max(glm::dot(normal, -lightDir), 0.0f);
 			glm::vec3 sphereCol = mat.colorVec();
 			sphereCol *= intensity;
-			col += sphereCol * multiplier;
-			multiplier *= 0.7f;
+			col += sphereCol *multiplier;
+			multiplier *= 0.5f;
 
 			//generate the bounce based on multiplier
 			glm::vec3 diff = BU::Diffuse(normal);
 			glm::vec3 spec = BU::reflect(ray.getDirection(), normal);
 			glm::vec3 dir = BU::lerp(diff, spec, mat.smoothness);
 
-			ray.origin(rec.p + normal * 0.00001f); ray.dir(dir);
+			ray.origin(rec.p + normal * 1e-5f); ray.dir(dir);
 
 		}
 		else {

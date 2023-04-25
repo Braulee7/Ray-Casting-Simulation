@@ -54,9 +54,9 @@ bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) con
 	}
 
 	rec.t = t;
-	rec.p = r.at(t);
+	rec.p = (r.getOrigin() - mCenter) + r.getDirection() * t;
 	rec.mat = mMat;
-	rec.normal = glm::normalize(rec.p - mCenter);
+	rec.normal = glm::normalize(rec.p);
 
 	return true;
 }
