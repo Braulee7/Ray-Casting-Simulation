@@ -110,21 +110,38 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 	//shoot a ray from the screen torward the pixel
 	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
 
-	hitRecord rec;
-	glm::vec3 col = glm::vec3(1);
+	hitRecord rec;				//holds our collision info
+	glm::vec3 col(1);			//final color of the pixel
+	glm::vec3 lightDir(-1);		//direction of incoming lightsource
+	lightDir = glm::normalize(lightDir);
+	float multiplier = 1.0f;
 
-	for (int i = 0; i < 50; i++)
+
+	for (int i = 0; i < 2; i++)
 	{
 		if (scene.hit(ray, 0.00001, std::numeric_limits<float>::infinity(), rec)) {
 			Material mat = rec.mat;
-			col *= mat.colorVec();
+			glm::vec3 normal = rec.normal;
 			
-			//reshoot ray from point of intersection (diffuse light)
-			srand((unsigned int)(ray.getOrigin().x + ray.getOrigin().y));
-			glm::vec3 target = rec.p + BU::Hemisphere(rec.normal);
-			ray = Ray(rec.p, target - rec.p);
+			//get the color from the current hit object
+			float intensity = glm::max(glm::dot(normal, -lightDir), 0.0f);
+			glm::vec3 sphereCol = mat.colorVec();
+			sphereCol *= intensity;
+			col += sphereCol * multiplier;
+			multiplier *= 0.7f;
+
+			//generate the bounce based on multiplier
+			glm::vec3 diff = BU::Diffuse(normal);
+			glm::vec3 spec = BU::reflect(ray.getDirection(), normal);
+			glm::vec3 dir = BU::lerp(diff, spec, mat.smoothness);
+
+			ray.origin(rec.p + normal * 0.00001f); ray.dir(dir);
+
 		}
 		else {
+			float t = 0.5 * ray.getDirection().y + 1;
+			glm::vec3 sky = (1 - t) * glm::vec3(1) + t * glm::vec3(0.5, .7f, 1);
+			col += sky * multiplier;
 			break;
 		}
 	}

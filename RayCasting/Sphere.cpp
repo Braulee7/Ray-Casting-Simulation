@@ -3,11 +3,12 @@
 #include "Sphere.h"
 #include "Hittable.h"
 
-Sphere::Sphere(glm::vec3& center, float radius, glm::vec3& color)
+Sphere::Sphere(glm::vec3& center, float radius, glm::vec3& color, float lightStrength, float smooth)
 {
 	mCenter = center;
 	mRadius = radius;
-	setColor(color);
+	mMat = Material(color, lightStrength);
+	mMat.smoothness = smooth;
 }
 
 float Sphere::getX() const
@@ -47,7 +48,7 @@ bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) con
 	float t = (-halfB - std::sqrt(discriminant)) / (a);
 
 	if (t < tMin || tMax < t) {
-		t = (-halfB - std::sqrt(discriminant)) / a;
+		t = (-halfB + std::sqrt(discriminant)) / a;
 		if (t < tMin || tMax < t)
 			return false;
 	}
@@ -55,8 +56,7 @@ bool Sphere::hit(const const Ray& r, float tMin, float tMax, hitRecord& rec) con
 	rec.t = t;
 	rec.p = r.at(t);
 	rec.mat = mMat;
-	glm::vec3 outwardNormal = (rec.p - mCenter) / mRadius;
-	rec.setNormal(r, outwardNormal);
+	rec.normal = glm::normalize(rec.p - mCenter);
 
 	return true;
 }

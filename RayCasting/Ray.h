@@ -9,6 +9,8 @@ public:
 	glm::vec3 getOrigin() const;
 	glm::vec3 getDirection() const;
 	glm::vec3 at(float t) const;
+	void origin(glm::vec3 newO) { mOrigin = newO; };
+	void dir(glm::vec3 newD) { mDirection = newD; };
 
 private:
 	glm::vec3 mOrigin;

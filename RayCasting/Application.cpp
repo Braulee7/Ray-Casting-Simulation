@@ -39,16 +39,19 @@ int App::Init()
 
 		//create the scene
 		glm::vec3 origin = glm::vec3(0, 0, -1);
-		glm::vec3 color = glm::vec3(245, 142, 224);
-		scene.add(std::make_shared<Sphere>(origin, 0.5, color));
+		glm::vec3 color = glm::vec3(0, 0, 224);
+		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f));
+
+
+		origin.x = -2; origin.y = 0; origin.z = 0;
+		color.x = 225; color.y = 0; color.z = 0;
+		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f, 0.89f));
 
 		origin.y = -100.5;
 		color.x = 0; color.y = 255; color.z = 0;
-		scene.add(std::make_shared<Sphere>(origin, 100, color));
+		scene.add(std::make_shared<Sphere>(origin, 100, color, 0.2f, 0.50f));
 
-		origin.x = -2; origin.y = 0; origin.z = 0;
-		color.x = 117; color.y = 205; color.z = 235;
-		scene.add(std::make_shared<Sphere>(origin, 0.5, color));
+
 
 	}
 	else {

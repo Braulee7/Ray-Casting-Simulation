@@ -1,7 +1,8 @@
 #include "Material.h"
 
-Material::Material(glm::vec3& color)
-	:mColor(color)
+
+Material::Material(glm::vec3& color, float light, float lightColour, float smooth)
+	:mColor(color), lightStrength(light), lightCol(lightColour), smoothness(smooth)
 {
 }
 
@@ -15,7 +16,7 @@ uint32_t Material::getColor()
 }
 
 glm::vec3 Material::colorVec() {
-	return mColor;
+	return BU::normalize(mColor);
 }
 
 void Material::setColor(glm::vec3& color)
