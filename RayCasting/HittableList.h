@@ -15,7 +15,6 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Hittable>> mObjects;
-
 };
 
 #endif

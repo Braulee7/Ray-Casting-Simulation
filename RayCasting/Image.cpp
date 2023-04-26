@@ -61,15 +61,16 @@ void Image::Render(HittableList &scene, Camera &cam)
 {
 	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
-
-	//clear data
+	//initialise data
 	memset(mImageData, 0, mHeight * mWidth * sizeof(uint32_t));
-	int pSamples = 5;
-	glm::vec3 col(0);
+
+	int pSamples = 5;	//number of samples per pixel
+	glm::vec3 col(0);	//will hold final color of pixel
 
 	//for each pixel of the image send it to our "frag shader"
 	for (uint32_t y = 0; y < mHeight; y++) {
 		for (uint32_t x = 0; x < mWidth; x++) {
+
 			//get pixel averages
 			for (int i = 0; i < pSamples; i++)
 			{
@@ -77,8 +78,10 @@ void Image::Render(HittableList &scene, Camera &cam)
 				glm::vec2 coord = { (float)x / (float)mWidth, (float)y / (float)mHeight };
 				coord = coord * 2.0f - 1.0f;
 
+				//generatea a ray from the coordinates of pixel
 				Ray ray = cam.ray(coord.x, coord.y);
 
+				//get the color of pixel
 				col = fragShader(ray, scene);
 			}
 
@@ -107,19 +110,17 @@ void Image::Render(HittableList &scene, Camera &cam)
 //meant return a color for each pixel on the screen
 glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 {
-	//shoot a ray from the screen torward the pixel
-	//Ray ray(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(coord.x, coord.y, -1.0f));
-
-	hitRecord rec;				//holds our collision info
-	glm::vec3 col(0);			//final color of the pixel
+	hitRecord rec;					//holds our collision info
+	glm::vec3 col(0);				//final color of the pixel
 	glm::vec3 lightDir(-10);		//direction of incoming lightsource
 	lightDir = glm::normalize(lightDir);
-	float multiplier = 1.0f;
+	float multiplier = 1.0f;		//to account for loss of energy with light
+	constexpr float inf = std::numeric_limits<float>::infinity();
+	int bounces = 2;
 
-
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < bounces; i++)
 	{
-		if (scene.hit(ray, 0.00001, std::numeric_limits<float>::infinity(), rec)) {
+		if (scene.hit(ray, 0.00001, inf, rec)) {
 			Material mat = rec.mat;
 			glm::vec3 normal = rec.normal;
 			
@@ -130,15 +131,16 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 			col += sphereCol *multiplier;
 			multiplier *= 0.5f;
 
-			//generate the bounce based on multiplier
+			//generate the bounce based on smoothness of material
 			glm::vec3 diff = BU::Diffuse(normal);
 			glm::vec3 spec = BU::reflect(ray.getDirection(), normal);
 			glm::vec3 dir = BU::lerp(diff, spec, mat.smoothness);
 
+			//set the ray to new point and direction
 			ray.origin(rec.p + normal * 1e-5f); ray.dir(dir);
 
 		}
-		else {
+		else {	//generate a ambient sky color
 			float t = 0.5 * ray.getDirection().y + 1;
 			glm::vec3 sky = (1 - t) * glm::vec3(1) + t * glm::vec3(0.5, .7f, 1);
 			col += sky * multiplier;
