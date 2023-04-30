@@ -19,7 +19,7 @@ Camera::Camera(glm::vec3& pos, glm::vec3& front, glm::vec3& up, float fov, float
 
 }
 
-Ray Camera::ray(float x, float y)
+Ray Camera::ray(float x, float y) const
 {
 	return Ray(mOrigin, x*horizontal + y*vertical - mOrigin);
 }

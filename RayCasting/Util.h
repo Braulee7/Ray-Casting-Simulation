@@ -87,14 +87,14 @@ namespace BU {
 
 		//gamma correction
 		auto scale = 1.0 / samples;
-		uint8_t red = sqrt(scale * vec.r);
-		uint8_t green = sqrt(scale * vec.g);
-		uint8_t blue = sqrt(scale * vec.b);
+		float r = sqrt(scale * vec.r);
+		float g = sqrt(scale * vec.g);
+		float b = sqrt(scale * vec.b);
 
 		//get to 255 rgb value
-		red = (uint8_t)((255 * red));
-		green = (uint8_t)((255 * green));
-		blue = (uint8_t)((255 * blue));
+		uint8_t red = (uint8_t)((255 * r));
+		uint8_t green = (uint8_t)((255 * g));
+		uint8_t blue = (uint8_t)((255 * b));
 
 		return 0xff000000 | (red << 16) | (green << 8) | (blue);
 	}

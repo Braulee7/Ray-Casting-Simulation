@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <limits>
+#include <execution>
 #include "Image.h"
 #include "Ray.h"
 #include "Sphere.h"
@@ -16,6 +17,7 @@ Image::Image()
 	mHeight = 0;
 	mImageData = nullptr;
 	mRenderer = nullptr;
+	col = glm::vec3(0);
 }
 
 Image::~Image()
@@ -24,11 +26,22 @@ Image::~Image()
 		SDL_DestroyTexture(mTexture);
 }
 
-void Image::Init(const int x, const int y, SDL_Renderer* renderer)
+void Image::Init(const int x, const int y, SDL_Renderer* renderer, HittableList &scene, Camera& cam)
 {
 	mWidth = x;
 	mHeight = y;
 	mRenderer = renderer;
+
+	mWidthIt.resize((uint32_t)mWidth);
+	mHeightIt.resize((uint32_t)mHeight);
+
+	for (int i = 0; i < mWidth; i++)
+		mWidthIt[i] = i;
+	for (int i = 0; i < mHeight; i++)
+		mHeightIt[i] = i;
+
+	mScene = scene;
+	mCam = cam;
 
 	InitTexture();
 }
@@ -57,7 +70,7 @@ void Image::InitTexture()
 	SDL_FreeSurface(tempSurface);
 }
 
-void Image::Render(HittableList &scene, Camera &cam)
+void Image::Render()
 {
 	//create a 1D array to hold the image information
 	mImageData = new uint32_t[mWidth * mHeight];
@@ -65,8 +78,32 @@ void Image::Render(HittableList &scene, Camera &cam)
 	memset(mImageData, 0, mHeight * mWidth * sizeof(uint32_t));
 
 	int pSamples = 5;	//number of samples per pixel
-	glm::vec3 col(0);	//will hold final color of pixel
 
+#define MULTITHREADING 1
+
+#if MULTITHREADING
+
+
+	std::for_each(std::execution::par, mHeightIt.begin(), mHeightIt.end(),
+		[this, pSamples](uint32_t y) {
+			std::for_each(std::execution::par, mWidthIt.begin(), mWidthIt.end(),
+			[this, y, pSamples](uint32_t x) {
+				int index = x + y * mWidth;
+					
+				for (int i = 0; i < pSamples; i++)
+				{
+
+					//get the color of pixel
+					col = fragShader(x, y);
+
+					mImageData[index] = BU::Color(col, 1);
+				}
+			});
+		
+		});
+
+	
+#else
 	//for each pixel of the image send it to our "frag shader"
 	for (uint32_t y = 0; y < mHeight; y++) {
 		for (uint32_t x = 0; x < mWidth; x++) {
@@ -79,10 +116,10 @@ void Image::Render(HittableList &scene, Camera &cam)
 				coord = coord * 2.0f - 1.0f;
 
 				//generatea a ray from the coordinates of pixel
-				Ray ray = cam.ray(coord.x, coord.y);
+				Ray ray = mCam.ray(coord.x, coord.y);
 
 				//get the color of pixel
-				col = fragShader(ray, scene);
+				col = fragShader(ray);
 			}
 
 			//put the pixel average into the image
@@ -90,6 +127,9 @@ void Image::Render(HittableList &scene, Camera &cam)
 		}
 	}
 
+#endif // MULTITHREADING
+
+	
 	//show the image to the renderer
 	SDL_UpdateTexture(mTexture, nullptr, mImageData, mWidth * sizeof(Uint32));
 
@@ -108,8 +148,16 @@ void Image::Render(HittableList &scene, Camera &cam)
 }
 
 //meant return a color for each pixel on the screen
-glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
+glm::vec3 Image::fragShader(uint32_t x, uint32_t y)
 {
+	//get coordinate of individual pixel
+	glm::vec2 coord = { (float)x / (float)mWidth, (float)y / (float)mHeight };
+	coord = coord * 2.0f - 1.0f;
+
+	//generatea a ray from the coordinates of pixel
+	Ray ray = mCam.ray(coord.x, coord.y);
+
+
 	hitRecord rec;					//holds our collision info
 	glm::vec3 col(0);				//final color of the pixel
 	glm::vec3 lightDir(-10);		//direction of incoming lightsource
@@ -120,7 +168,7 @@ glm::vec3 Image::fragShader(Ray &ray, HittableList& scene)
 
 	for (int i = 0; i < bounces; i++)
 	{
-		if (scene.hit(ray, 0.00001, inf, rec)) {
+		if (mScene.hit(ray, 0.00001, inf, rec)) {
 			Material mat = rec.mat;
 			glm::vec3 normal = rec.normal;
 			

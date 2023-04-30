@@ -11,7 +11,7 @@ class Camera {
 public:
 	Camera() = default;
 	Camera(glm::vec3& pos, glm::vec3& front, glm::vec3& up, float fov, float aspectRatio);
-	Ray ray(float x, float y);
+	Ray ray(float x, float y) const;
 
 private:
 

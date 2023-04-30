@@ -35,8 +35,6 @@ int App::Init()
 		//successfully created
 		mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
 
-		mImg.Init(1280, 720, mRenderer);
-
 		//create the scene
 		glm::vec3 origin = glm::vec3(0, 0, -1);
 		glm::vec3 color = glm::vec3(0, 0, 224);
@@ -50,6 +48,10 @@ int App::Init()
 		origin.y = -100.5;
 		color.x = 0; color.y = 255; color.z = 0;
 		scene.add(std::make_shared<Sphere>(origin, 100, color, 0.2f, 0.50f));
+
+		mImg.Init(1280, 720, mRenderer, scene, mCam);
+
+		
 
 
 
@@ -114,7 +116,7 @@ void App::Render()
 	SDL_RenderClear(mRenderer);
 
 
-	mImg.Render(scene, mCam);
+	mImg.Render();
 
 	SDL_RenderPresent(mRenderer);
 }
