@@ -164,7 +164,7 @@ glm::vec3 Image::fragShader(uint32_t x, uint32_t y)
 	lightDir = glm::normalize(lightDir);
 	float multiplier = 1.0f;		//to account for loss of energy with light
 	constexpr float inf = std::numeric_limits<float>::infinity();
-	int bounces = 2;
+	int bounces = 4;
 
 	for (int i = 0; i < bounces; i++)
 	{

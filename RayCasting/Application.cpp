@@ -38,16 +38,20 @@ int App::Init()
 		//create the scene
 		glm::vec3 origin = glm::vec3(0, 0, -1);
 		glm::vec3 color = glm::vec3(0, 0, 224);
-		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f));
+		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.0f));
 
 
 		origin.x = -2; origin.y = 0; origin.z = 0;
 		color.x = 225; color.y = 0; color.z = 0;
-		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f, 0.89f));
+		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f, 1.0f));
+		
+		origin.x = -1; origin.y = 0; origin.z = 0;
+		color.x = 1; color.y = 1; color.z = 1;
+		scene.add(std::make_shared<Sphere>(origin, 0.5f, color, 0.1f, 1.0f));
 
 		origin.y = -100.5;
 		color.x = 0; color.y = 255; color.z = 0;
-		scene.add(std::make_shared<Sphere>(origin, 100, color, 0.2f, 0.50f));
+		scene.add(std::make_shared<Sphere>(origin, 100, color, 0.2f, 0.0f));
 
 		mImg.Init(1280, 720, mRenderer, scene, mCam);
 
