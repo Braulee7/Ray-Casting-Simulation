@@ -1,11 +1,9 @@
-#include "SDL.h"
-#include "Application.h"
+#include "App.hpp"
 
-int main(int argc, char* argv[])
-{
-    App raycaster;
+int main(int argc, char* argv[]) {
+	App Raycaster(720, 1280);
 
-    raycaster.Run();
+	Raycaster.Run();
 
-    return 0;
+	return 0;
 }

@@ -60,7 +60,7 @@ namespace BU {
 	//args:		
 	//		in: The intersection ray
 	//		normal: The normal ray from the point of intersection
-	glm::vec3 inline reflect(glm::vec3&& in, glm::vec3& normal) {
+	glm::vec3 inline reflect(glm::vec3& in, glm::vec3& normal) {
 		glm::vec3 i = glm::normalize(in);
 		return i - 2.0f * normal * glm::dot(i, normal);
 		
