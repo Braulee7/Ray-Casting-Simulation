@@ -14,6 +14,11 @@ struct Image {
 			delete[] mImageData; 
 	}
 
+	void Resize(uint32_t width, uint32_t height) {
+		mWidth = width;
+		mHeight = height;
+	}
+
 	void SetImage() {
 		mImageData = new uint32_t[mWidth * mHeight];
 		memset(mImageData, 0, mWidth * mHeight * sizeof(uint32_t));

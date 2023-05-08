@@ -109,9 +109,7 @@ private:
 	int Init() {
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0) return -1;
 
-		
-
-		mWindow = SDL_CreateWindow("Braulee RayTracing", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, SDL_WINDOW_SHOWN);
+		mWindow = SDL_CreateWindow("Braulee RayTracing", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWidth, mHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 		
 		if (!mWindow) return -2; //failure to create window
 
@@ -165,8 +163,22 @@ private:
 		case SDL_QUIT:
 			mRunning = false;
 			break;
+
+		case SDL_WINDOWEVENT:
+			if (e->window.event == SDL_WINDOWEVENT_RESIZED)
+				Resize(e->window.data1, e->window.data2);
 		}
 	}
+
+	void Resize(uint32_t width, uint32_t height) {
+		mWidth = width;
+		mHeight = height;
+		mWidthIt.resize(mWidth);
+		mHeightIt.resize(mHeight);
+
+		mImage.Resize(mWidth, mHeight);
+	}
+
 	void Render() {
 	
 		SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
@@ -174,7 +186,7 @@ private:
 
 		//render the scene
 		mImage.SetImage();
-#define MT 1
+#define MT 0
 
 		int pSamples = 10;
 #if MT
@@ -198,13 +210,11 @@ private:
 		for (uint32_t y = 0; y < mHeight; y++) {
 			for (uint32_t x = 0; x < mWidth; x++) {
 				int index = x + y * mWidth;
-
+				
 				for (int i = 0; i < pSamples; i++) {
-					col += Pixel(x, y);	
+					col = Pixel(x, y);	
 				}
 				mImage.mImageData[index] = BU::Color(col, pSamples);
-				if (open)
-					fout << index << "\n";
 			}
 		}
 #endif
