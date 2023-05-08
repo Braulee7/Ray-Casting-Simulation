@@ -20,11 +20,15 @@ struct Image {
 	}
 
 	void SetImage() {
+		if (mImageData)
+			DeleteImage();
 		mImageData = new uint32_t[mWidth * mHeight];
 		memset(mImageData, 0, mWidth * mHeight * sizeof(uint32_t));
 	}
 
 	void DeleteImage() {
+		if (!mImageData)
+			return;
 		delete[] mImageData;
 		mImageData = nullptr;
 	}

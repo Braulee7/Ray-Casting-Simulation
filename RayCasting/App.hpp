@@ -19,7 +19,6 @@ public:
 		//dimensions of image
 		mWidth = width;
 		mHeight = height;
-		std::cout << mWidth << '\t' << mHeight << std::endl;
 		mImage = Image(width, height);
 
 		//render variables
@@ -59,29 +58,24 @@ public:
 
 		if (Init() < 0) return 0;
 
-		// Perfomance variables to check render time
-		Uint64 curr = SDL_GetPerformanceCounter();
-		Uint64 last = 0;
-		double delta = 0;
+		
 
 		//application loop
 		while (mRunning) {
 
 			//get render time from last frame
-			last = curr;
-			curr = SDL_GetPerformanceCounter();
-			delta = (double)((curr - last) * 1000 / (double)SDL_GetPerformanceFrequency());
+			
 
 			//check inputs from user
 			while (SDL_PollEvent(&e) != 0)
 				Event(&e);
-
-			//render the scene
+		
+			//get raycasted image
 			Render();
 
+
 			//show render time to user
-			system("cls");
-			std::cerr << "Time since last render: " << delta << "ms\n";
+			
 		}
 
 		return 1;
@@ -177,16 +171,49 @@ private:
 		mHeightIt.resize(mHeight);
 
 		mImage.Resize(mWidth, mHeight);
+
+		//recast to get the new location of the image
+		mImage.DeleteImage();
 	}
 
 	void Render() {
-	
 		SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 		SDL_RenderClear(mRenderer);
 
+		if (!mImage.mImageData) {
+			// Perfomance variables to check render time
+			Uint64 start = SDL_GetPerformanceCounter();
+
+			RenderRayCast();
+
+			Uint64 end = SDL_GetPerformanceCounter();
+
+			std::cerr << "Image took " << (float)((end - start) / SDL_GetPerformanceFrequency()) << "ms to render\n";
+		}
+
+		SDL_UpdateTexture(mTexture, nullptr, mImage.mImageData, mWidth * sizeof(Uint32));
+
+
+		SDL_Rect src, bound;
+		src.x = 0;
+		src.y = 0;
+		src.w = mWidth;
+		src.h = mHeight;
+		bound = src;
+		SDL_RenderCopyEx(mRenderer, mTexture, &src, &bound, 0, NULL, SDL_FLIP_VERTICAL);
+
+		SDL_RenderPresent(mRenderer);
+	}
+
+	void RenderDefault() {
+		
+	}
+
+	void RenderRayCast() {
+
 		//render the scene
 		mImage.SetImage();
-#define MT 0
+#define MT 1
 
 		int pSamples = 10;
 #if MT
@@ -210,27 +237,18 @@ private:
 		for (uint32_t y = 0; y < mHeight; y++) {
 			for (uint32_t x = 0; x < mWidth; x++) {
 				int index = x + y * mWidth;
-				
+				accumulatedColor[index] = glm::vec3(0);
 				for (int i = 0; i < pSamples; i++) {
 					col = Pixel(x, y);	
+					accumulatedColor[index] += col;
 				}
-				mImage.mImageData[index] = BU::Color(col, pSamples);
+				accumulatedColor[index] = glm::clamp(accumulatedColor[index], glm::vec3(0), glm::vec3(255));
+
+				mImage.mImageData[index] = BU::Color(accumulatedColor[index], pSamples);
 			}
 		}
 #endif
 
-		SDL_UpdateTexture(mTexture, nullptr, mImage.mImageData, mWidth * sizeof(Uint32));
-
-		mImage.DeleteImage();
-		SDL_Rect src, bound;
-		src.x = 0;
-		src.y = 0;
-		src.w = mWidth;
-		src.h = mHeight;
-		bound = src;
-		SDL_RenderCopyEx(mRenderer, mTexture, &src, &bound, 0, NULL, SDL_FLIP_VERTICAL);
-
-		SDL_RenderPresent(mRenderer);
 	}
 
 	glm::vec3 Pixel(uint32_t x, uint32_t y) {
