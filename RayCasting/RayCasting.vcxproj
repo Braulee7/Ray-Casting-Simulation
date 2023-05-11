@@ -148,6 +148,7 @@
     <ClInclude Include="Ray.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Sphere.hpp" />
+    <ClInclude Include="Triangle.hpp" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>

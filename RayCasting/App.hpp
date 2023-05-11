@@ -72,9 +72,6 @@ public:
 		
 			//get raycasted image
 			Render();
-
-
-			//show render time to user
 			
 		}
 
@@ -158,6 +155,7 @@ private:
 			mRunning = false;
 			break;
 
+		//if user resized the window 
 		case SDL_WINDOWEVENT:
 			if (e->window.event == SDL_WINDOWEVENT_RESIZED)
 				Resize(e->window.data1, e->window.data2);
@@ -165,6 +163,7 @@ private:
 	}
 
 	void Resize(uint32_t width, uint32_t height) {
+		//reget the height and width of image
 		mWidth = width;
 		mHeight = height;
 		mWidthIt.resize(mWidth);
@@ -180,6 +179,9 @@ private:
 		SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 		SDL_RenderClear(mRenderer);
 
+		//if the image wasn't already rendered
+		//static rendering so no need to repeat
+		//math if not needed
 		if (!mImage.mImageData) {
 			// Perfomance variables to check render time
 			Uint64 start = SDL_GetPerformanceCounter();
@@ -188,7 +190,7 @@ private:
 
 			Uint64 end = SDL_GetPerformanceCounter();
 
-			std::cerr << "Image took " << (float)((end - start) / SDL_GetPerformanceFrequency()) << "ms to render\n";
+			std::cerr << "Image took " << (float)((end - start) / SDL_GetPerformanceFrequency()) << "s to render\n";
 		}
 
 		SDL_UpdateTexture(mTexture, nullptr, mImage.mImageData, mWidth * sizeof(Uint32));
@@ -205,10 +207,14 @@ private:
 		SDL_RenderPresent(mRenderer);
 	}
 
+	//TODO loading image if needed
+	//or a scene set up
 	void RenderDefault() {
 		
 	}
 
+	//math operations to get the 
+	//raycasting working
 	void RenderRayCast() {
 
 		//render the scene
