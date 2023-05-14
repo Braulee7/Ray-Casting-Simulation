@@ -145,6 +145,7 @@
     <ClInclude Include="Hittable.hpp" />
     <ClInclude Include="Image.hpp" />
     <ClInclude Include="Material.hpp" />
+    <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Ray.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Sphere.hpp" />

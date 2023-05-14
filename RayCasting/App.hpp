@@ -6,16 +6,18 @@
 #include <vector>
 #include <execution>
 #include <fstream>
+#include <sstream>
 #include <filesystem>
+#include <string>
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "Image.hpp"
 #include "Sphere.hpp"
-
+#include "Mesh.hpp"
 
 class App {
 public:
-	App(int height, int width) {
+	App(int height, int width, int argc, char* argv[]) {
 		//dimensions of image
 		mWidth = width;
 		mHeight = height;
@@ -46,6 +48,10 @@ public:
 		mWindow = nullptr;
 		mRenderer = nullptr;
 		mTexture = nullptr;
+
+
+		//parse the command line
+		CommandLine(argc, argv);
 	}
 	~App() {
 		SDL_DestroyRenderer(mRenderer);
@@ -62,17 +68,11 @@ public:
 
 		//application loop
 		while (mRunning) {
-
-			//get render time from last frame
-			
-
 			//check inputs from user
 			while (SDL_PollEvent(&e) != 0)
 				Event(&e);
-		
 			//get raycasted image
 			Render();
-			
 		}
 
 		return 1;
@@ -106,21 +106,7 @@ private:
 
 		mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
 		InitTexture();
-		//create the scene
-		glm::vec3 ori(0, 0, -1);
-		glm::vec3 color(1, 1, 1);
-
-		mScene.add(std::make_shared<Sphere>(ori, 0.5f, color, 1));
-
-		ori.x = -2; 
-		color.r = 255; color.b = 0;
-		mScene.add(std::make_shared<Sphere>(ori, 0.5f, color, 1.0f));
-		
-		ori.x = 0; ori.y = -100; ori.z = -10;
-		color.r = 0; color.g = 255;
-		mScene.add(std::make_shared<Sphere>(ori, 100.0f, color));
-
-
+	
 		return 1; //success
 	
 	}
@@ -148,6 +134,111 @@ private:
 		SDL_FreeSurface(tempSurface);
 
 	}
+
+	void CommandLine(int argc, char* argv[]) {
+		if (argc < 2)
+			//load default image
+			return;
+
+		std::string file;
+		//parse command lines
+		for (int i = 1; i < argc; i++) {
+			/* Optional file to load in a scene */
+			if (std::string(argv[i]) == "--scene" || std::string(argv[i]) == "-s") {
+				if (i + 1 > argc) {
+					std::cerr << "No source file selected, loading default scene...\n";
+					return;
+				}
+				file = argv[++i];
+			}
+
+			/* help to know command line arguments*/
+			 else if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
+				std::cerr << "Optional Arguments:\n"
+					<< "--scene / -s: load in a scene from a .braulee file\n"
+					<< "\tArguments: filepath to the scene file\n"
+					<< "--help / -h: bring up list of commands\n"
+					<< "--DMT: allows multithreading to be used in the rendering, speeds up processes\n";
+				exit(0);	//help automatically exits
+			}
+			 else if (std::string(argv[i]) == "--DMT") {
+					#define MT 1
+			}
+
+			/* unkown command*/
+			 else {
+				std::cerr << "Uknown command: " << argv[i] << " failure to process\n";
+				exit(-1);
+			}
+		}
+		
+		//parse the file to get scene
+		LoadScene(file);
+	}
+
+	void LoadScene(std::string& filePath) {
+		if (!std::filesystem::exists(filePath)) {
+			std::cerr << "Failed to find scene, check your filepath and ensure it's correct.\n";
+			exit(-1);
+		}
+
+		std::ifstream in(filePath, std::ios::in);
+		if (!in)
+		{
+			std::cerr << "Cannot open " << filePath << std::endl;
+			exit(1);
+
+		}
+		//mesh to hold our triangles
+		Mesh tempMesh;
+
+		//points to hold the three vertices of a triangle
+		glm::vec3 points[3];
+		glm::vec3 col(255);
+		std::string line;
+
+		int count = 0;
+		while (std::getline(in, line))
+		{
+			//check v for vertices
+			if (line.substr(0, 2) == "v ") {
+				std::istringstream v(line.substr(2));
+				float x, y, z;
+				v >> x; v >> y; v >> z;
+				points[count++] = glm::vec3(x * 2, y * 2 , z * -2);
+
+				if (count > 2) {
+					//reset the count
+					count = 0;
+					//add triangle to the mesh
+					tempMesh.Add(points[0], points[1], points[2], col);
+				}
+
+			}
+
+		}
+
+		//add the mesh to the scene
+		mScene.add(std::make_shared<Mesh>(tempMesh));
+
+	}
+
+	void LoadDefault() {
+		glm::vec3 origin, col;
+		
+		origin.x = 0; origin.y = 0; origin.z = -2;
+		col.x = 255; col.y = 0; col.z = 255;
+		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col));
+		
+		origin.x = -2; origin.y = 0; origin.z = -2;
+		col.x = 1; col.y = 1; col.z = 5;
+		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col, 1.0f));
+		
+		origin.x = 2; origin.y = 0; origin.z = -2;
+		col.x = 1; col.y = 1; col.z = 1;
+		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col, 1.0f));
+	}
+
 	void Event(SDL_Event* e) {
 		
 		switch (e->type) {
@@ -219,10 +310,12 @@ private:
 
 		//render the scene
 		mImage.SetImage();
-#define MT 1
-
 		int pSamples = 10;
 #if MT
+		/* MULTITHREADED path if user enables it
+		*  Eats up all processing units so can't
+		* have anything else running
+		*/
 		std::for_each(std::execution::par, mHeightIt.begin(), mHeightIt.end(),
 			[this, pSamples](uint32_t y) {
 				std::for_each(std::execution::par, mWidthIt.begin(), mWidthIt.end(),
@@ -240,6 +333,7 @@ private:
 				});
 			});
 #else
+		/* Single unparalleled path if user does not enable */
 		for (uint32_t y = 0; y < mHeight; y++) {
 			for (uint32_t x = 0; x < mWidth; x++) {
 				int index = x + y * mWidth;
@@ -257,6 +351,7 @@ private:
 
 	}
 
+	// Function to get each individual pixel color
 	glm::vec3 Pixel(uint32_t x, uint32_t y) {
 		//get coord of pixel
 		glm::vec2 coord = { (float)x / (float)mWidth, (float)y / (float)mHeight };
@@ -290,7 +385,7 @@ private:
 				glm::vec3 dir = BU::lerp(diff, spec, mat.mSmoothness);
 
 				ray.mOrigin = rec.hitPoint + normal * 1e-5f;
-				ray.mDirection = dir;
+				ray.mDirection = glm::normalize(dir);
 			}
 			else {
 				float t = 0.5 * ray.mDirection.y + 1;
