@@ -28,7 +28,7 @@ appreciate any feedback given on performance boosters, code readablity, and anyt
 constructive though! 
 
 # Rendered Images
-![Suzanne and Spheres] (images/Raytracing_Scene)
+![Suzanne and Spheres] (Images/Raytracing_Scene)
 
 #References
   - ![Raytracing In One Weekend Series] (https://raytracing.github.io/books/RayTracingInOneWeekend.html)
