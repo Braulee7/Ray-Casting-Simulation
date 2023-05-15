@@ -54,12 +54,16 @@ public:
 		//parse the command line
 		CommandLine(argc, argv);
 	}
+
+
 	~App() {
 		SDL_DestroyRenderer(mRenderer);
 		SDL_DestroyWindow(mWindow);
 		SDL_Quit();
 		delete[] accumulatedColor;
 	}
+
+
 	int inline Run() {
 		SDL_Event e;
 
@@ -79,25 +83,34 @@ public:
 		return 1;
 	}
 
-private:
+private://variables
+
+	//SDL Variables
 	bool mRunning;
+	SDL_Texture* mTexture;
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
+
+	//rendering variables
 	Camera mCam;
 	Image mImage;
-	SDL_Texture* mTexture;
 	std::vector<uint32_t> mWidthIt, mHeightIt;
-	
-	
 	glm::vec3 col;
 	glm::vec3* accumulatedColor;
 	Scene mScene;
-
 	uint32_t mWidth, mHeight;
 
+	//check if user wants to multithread
+	bool multiThreading = false;
 
 
-private:
+
+private://functions
+
+
+	/* Initialises SDL variables to create the image
+	*  and present it to the user
+	*/
 	int Init() {
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0) return -1;
 
@@ -115,6 +128,8 @@ private:
 	void InitTexture() {
 		Uint32 rmask, gmask, bmask, amask;
 
+		// check the endianess of machine to get 
+		// correct bit order
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 		rmask = 0xff000000;
 		gmask = 0x00ff0000;
@@ -137,12 +152,10 @@ private:
 	}
 
 	void CommandLine(int argc, char* argv[]) {
-		if (argc < 2)
-			//load default image
-			return;
+		if (argc < 2) return; // no commands to parse 
 
-		std::string file;
-		//parse command lines
+		std::string file = "";
+		//parse command line
 		for (int i = 1; i < argc; i++) {
 			/* Optional file to load in a scene */
 			if (std::string(argv[i]) == "--scene" || std::string(argv[i]) == "-s") {
@@ -163,7 +176,7 @@ private:
 				exit(0);	//help automatically exits
 			}
 			 else if (std::string(argv[i]) == "--DMT") {
-					#define MT 1
+				multiThreading = true;
 			}
 
 			/* unkown command*/
@@ -172,17 +185,25 @@ private:
 				exit(-1);
 			}
 		}
-		
-		//parse the file to get scene
-		LoadScene(file);
+
+		if (file == "")
+			LoadDefault();
+		else
+			//parse the file to get scene
+			LoadScene(file);
 	}
 
+	/* Loads in an .obj file from the user if necessary
+	*  Has to make sure that the file is created with 
+	*  Triangles in mind
+	*/
 	void LoadScene(std::string& filePath) {
 		if (!std::filesystem::exists(filePath)) {
 			std::cerr << "Failed to find scene, check your filepath and ensure it's correct.\n";
 			exit(-1);
 		}
 
+		//to parse file
 		std::stringstream ss;
 		std::ifstream fin(filePath);
 		std::string line = "";
@@ -190,16 +211,19 @@ private:
 		glm::vec3 tempVec3;
 		int tempIndex = 0;
 
+		//to hold the actual data
 		std::vector<glm::vec3> vertices;
 		std::vector<glm::vec3> normals;
 		std::vector<int> posIndices;
 		std::vector<int> normIndices;
 
+		/* error check the file*/
 		if (!fin.is_open()) {
 			std::cerr << "Failed to open the file check path.\n";
 			exit(-1);
 		}
 
+		/* Parse the file to get necessary information to render the image*/
 		while (std::getline(fin, line)) {
 			ss.clear();
 			ss.str(line);
@@ -210,7 +234,7 @@ private:
 				vertices.push_back(tempVec3);
 
 			}
-			else if (prefix == "vn") {
+			else if (prefix == "vn") {	//normals
 				ss >> tempVec3.x >> tempVec3.y >> tempVec3.z;
 				normals.push_back(tempVec3);
 			
@@ -220,11 +244,11 @@ private:
 				int count = 0;
 				while (ss >> tempIndex) {
 					switch (count) {
-					case 0: //vertex position position
+					case 0: //vertex position
 						
 						posIndices.push_back(tempIndex - 1);
 						break;
-					case 2:
+					case 2:	//vertex normals
 						
 						normIndices.push_back(tempIndex - 1);
 					}
@@ -246,7 +270,10 @@ private:
 		BuildObj(vertices, normals, posIndices, normIndices);
 	}
 
+	/* If there is no scene loaded in render a default image
+	*/
 	void LoadDefault() {
+
 		glm::vec3 origin, col;
 		
 		origin.x = 0; origin.y = 0; origin.z = -2;
@@ -266,8 +293,9 @@ private:
 
 		Mesh mesh;
 
-		int count = 0;
+		int count = 0;	//count to make sure we add a triangle every 3 indices
 
+		//		  position		normals			color
 		glm::vec3 triangle[3], normal[3], col(125, 23, 212);
 
 		//use the indices to add create the mesh
@@ -366,7 +394,7 @@ private:
 
 		SDL_UpdateTexture(mTexture, nullptr, mImage.mImageData, mWidth * sizeof(Uint32));
 
-
+		/* Present the image to SDL and user*/
 		SDL_Rect src, bound;
 		src.x = 0;
 		src.y = 0;
@@ -378,12 +406,6 @@ private:
 		SDL_RenderPresent(mRenderer);
 	}
 
-	//TODO loading image if needed
-	//or a scene set up
-	void RenderDefault() {
-		
-	}
-
 	//math operations to get the 
 	//raycasting working
 	void RenderRayCast() {
@@ -391,15 +413,32 @@ private:
 		//render the scene
 		mImage.SetImage();
 		int pSamples = 10;
-#if MT
-		/* MULTITHREADED path if user enables it
-		*  Eats up all processing units so can't
-		* have anything else running
-		*/
-		std::for_each(std::execution::par, mHeightIt.begin(), mHeightIt.end(),
-			[this, pSamples](uint32_t y) {
-				std::for_each(std::execution::par, mWidthIt.begin(), mWidthIt.end(),
-				[this , y, pSamples](uint32_t x) {
+		if (multiThreading) {
+			/* MULTITHREADED path if user enables it
+			*  Eats up all processing units so can't
+			* have anything else running
+			*/
+			std::for_each(std::execution::par, mHeightIt.begin(), mHeightIt.end(),
+				[this, pSamples](uint32_t y) {
+					std::for_each(std::execution::par, mWidthIt.begin(), mWidthIt.end(),
+					[this, y, pSamples](uint32_t x) {
+							int index = x + y * mWidth;
+							accumulatedColor[index] = glm::vec3(0);
+							for (int i = 0; i < pSamples; i++) {
+								col = Pixel(x, y);
+								accumulatedColor[index] += col;
+							}
+							accumulatedColor[index] = glm::clamp(accumulatedColor[index], glm::vec3(0), glm::vec3(255));
+
+							mImage.mImageData[index] = BU::Color(accumulatedColor[index], pSamples);
+
+						});
+				});
+		}
+		else {
+			/* Single unparalleled path if user does not enable */
+			for (uint32_t y = 0; y < mHeight; y++) {
+				for (uint32_t x = 0; x < mWidth; x++) {
 					int index = x + y * mWidth;
 					accumulatedColor[index] = glm::vec3(0);
 					for (int i = 0; i < pSamples; i++) {
@@ -409,25 +448,9 @@ private:
 					accumulatedColor[index] = glm::clamp(accumulatedColor[index], glm::vec3(0), glm::vec3(255));
 
 					mImage.mImageData[index] = BU::Color(accumulatedColor[index], pSamples);
-					
-				});
-			});
-#else
-		/* Single unparalleled path if user does not enable */
-		for (uint32_t y = 0; y < mHeight; y++) {
-			for (uint32_t x = 0; x < mWidth; x++) {
-				int index = x + y * mWidth;
-				accumulatedColor[index] = glm::vec3(0);
-				for (int i = 0; i < pSamples; i++) {
-					col = Pixel(x, y);	
-					accumulatedColor[index] += col;
 				}
-				accumulatedColor[index] = glm::clamp(accumulatedColor[index], glm::vec3(0), glm::vec3(255));
-
-				mImage.mImageData[index] = BU::Color(accumulatedColor[index], pSamples);
 			}
 		}
-#endif
 
 	}
 
@@ -453,6 +476,7 @@ private:
 				Material mat = rec.mat;
 				glm::vec3 normal = rec.normal;
 
+				//calculate color color of hit object with the intensity of the light
 				float intensity = glm::max(glm::dot(normal, -mScene.mLightDirection), 0.0f);
 				glm::vec3 sphereCol = mat.mColor;
 				sphereCol *= intensity;
@@ -460,14 +484,17 @@ private:
 				color += sphereCol * multiplier;
 				multiplier *= 0.5f;
 
+				//get direction of next ray based on smoothness of object
 				glm::vec3 spec = BU::reflect(ray.mDirection, normal);
 				glm::vec3 diff = BU::Diffuse(normal);
 				glm::vec3 dir = BU::lerp(diff, spec, mat.mSmoothness);
 
+				//redirect ray
 				ray.mOrigin = rec.hitPoint + normal * 1e-5f;
 				ray.mDirection = glm::normalize(dir);
 			}
 			else {
+				//missed so generate sky color
 				float t = 0.5 * ray.mDirection.y + 1;
 				glm::vec3 sky = (1 - t) * glm::vec3(1) + t * glm::vec3(0.5, .7f, 1);
 				sky = glm::vec3(0.6f, 0.7f, 0.9f);
