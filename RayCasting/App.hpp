@@ -268,17 +268,53 @@ private:
 
 		int count = 0;
 
-		glm::vec3 triangle[3], normal[3], col(255, 0, 255);
+		glm::vec3 triangle[3], normal[3], col(125, 23, 212);
 
+		//use the indices to add create the mesh
 		for (int i = 0; i < position_index.size(); i++) {
 			triangle[count] = vertices[position_index[i]];
 			normals[count++] = normals[normal_index[i]];
 
 			if (count > 2) {
 				count = 0;
-				mesh.Add(triangle[0], triangle[1], triangle[2], normal[0], normal[1], normal[2], col);
+				mesh.Add(triangle[0], triangle[1], triangle[2], normal[0], normal[1], normal[2], col, 0.5f);
 			}
 		}
+
+		//add random spheres around to scene
+		glm::vec3 origin, color;
+		origin.x = 0; origin.y = -100; origin.z = -10;
+		color.r = 0; color.g = 255; color.b = 0;
+		mScene.add(std::make_shared<Sphere>(origin, 100.0f, color, 0.0f));
+
+		origin.x = -2; origin.y = 1; origin.z = -2;
+		color.r = 255; color.g = color.b = 1;
+		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
+		
+		origin.x = 2; origin.y = 1; origin.z = -2;
+		color.r = 0; color.g = 0; color.b = 255;
+		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
+
+
+		origin.y = 0;
+		color.r = 255; color.b = 255;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+		
+		origin.x = 5;
+		color.r = 233; color.g = 122; color.b = 54;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+		
+		origin.x = -2;
+		color.r = 23; color.g = 23; color.b = 111;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+		
+		origin.x = -4;
+		color.r = 23; color.g = 5; color.b = 76;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+		
+		origin.x = -3;
+		color.r = 2; color.g = 233; color.b = 11;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 1.5f));
 
 		mScene.add(std::make_shared<Mesh>(mesh));
 	}
