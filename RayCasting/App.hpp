@@ -9,6 +9,7 @@
 #include <sstream>
 #include <filesystem>
 #include <string>
+#include <cstring>
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "Image.hpp"
@@ -182,45 +183,67 @@ private:
 			exit(-1);
 		}
 
-		std::ifstream in(filePath, std::ios::in);
-		if (!in)
-		{
-			std::cerr << "Cannot open " << filePath << std::endl;
-			exit(1);
+		std::stringstream ss;
+		std::ifstream fin(filePath);
+		std::string line = "";
+		std::string prefix = "";
+		glm::vec3 tempVec3;
+		int tempIndex = 0;
 
+		std::vector<glm::vec3> vertices;
+		std::vector<glm::vec3> normals;
+		std::vector<int> posIndices;
+		std::vector<int> normIndices;
+
+		if (!fin.is_open()) {
+			std::cerr << "Failed to open the file check path.\n";
+			exit(-1);
 		}
-		//mesh to hold our triangles
-		Mesh tempMesh;
 
-		//points to hold the three vertices of a triangle
-		glm::vec3 points[3];
-		glm::vec3 col(255);
-		std::string line;
+		while (std::getline(fin, line)) {
+			ss.clear();
+			ss.str(line);
+			ss >> prefix;
 
-		int count = 0;
-		while (std::getline(in, line))
-		{
-			//check v for vertices
-			if (line.substr(0, 2) == "v ") {
-				std::istringstream v(line.substr(2));
-				float x, y, z;
-				v >> x; v >> y; v >> z;
-				points[count++] = glm::vec3(x * 2, y * 2 , z * -2);
+			if (prefix == "v") {	//vertex
+				ss >> tempVec3.x >> tempVec3.y >> tempVec3.z;
+				vertices.push_back(tempVec3);
 
-				if (count > 2) {
-					//reset the count
-					count = 0;
-					//add triangle to the mesh
-					tempMesh.Add(points[0], points[1], points[2], col);
+			}
+			else if (prefix == "vn") {
+				ss >> tempVec3.x >> tempVec3.y >> tempVec3.z;
+				normals.push_back(tempVec3);
+			
+			}
+
+			else if (prefix == "f") {	//face
+				int count = 0;
+				while (ss >> tempIndex) {
+					switch (count) {
+					case 0: //vertex position position
+						
+						posIndices.push_back(tempIndex - 1);
+						break;
+					case 2:
+						
+						normIndices.push_back(tempIndex - 1);
+					}
+
+					if (ss.peek() == '/') {
+						++count;
+						ss.ignore(1, '/');
+					}
+					else if (ss.peek() == ' ') {
+						count = 0;
+						ss.ignore(1, ' ');
+					}
 				}
-
 			}
 
 		}
 
-		//add the mesh to the scene
-		mScene.add(std::make_shared<Mesh>(tempMesh));
-
+		//index buffer to build the object
+		BuildObj(vertices, normals, posIndices, normIndices);
 	}
 
 	void LoadDefault() {
@@ -237,6 +260,27 @@ private:
 		origin.x = 2; origin.y = 0; origin.z = -2;
 		col.x = 1; col.y = 1; col.z = 1;
 		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col, 1.0f));
+	}
+
+	void BuildObj(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<int> position_index, std::vector<int> normal_index) {
+
+		Mesh mesh;
+
+		int count = 0;
+
+		glm::vec3 triangle[3], normal[3], col(255, 0, 255);
+
+		for (int i = 0; i < position_index.size(); i++) {
+			triangle[count] = vertices[position_index[i]];
+			normals[count++] = normals[normal_index[i]];
+
+			if (count > 2) {
+				count = 0;
+				mesh.Add(triangle[0], triangle[1], triangle[2], normal[0], normal[1], normal[2], col);
+			}
+		}
+
+		mScene.add(std::make_shared<Mesh>(mesh));
 	}
 
 	void Event(SDL_Event* e) {

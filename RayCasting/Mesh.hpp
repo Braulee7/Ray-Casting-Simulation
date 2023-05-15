@@ -15,6 +15,15 @@ public:
 		Add(a, b, c, col, smoothness);
 	}
 
+	Mesh(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 na, glm::vec3 nb, glm::vec3 nc, glm::vec3 col, float smoothness = 0) {
+		Add(a, b, c, na, nb, nc, col, smoothness);
+	}
+
+	void Add(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 na, glm::vec3 nb, glm::vec3 nc, glm::vec3 col, float smoothness = 0) {
+		triangles.emplace_back(a, b, c, na, nb, nc, col, smoothness);
+	}
+
+
 	void Add(glm::vec3& a, glm::vec3& b, glm::vec3& c, glm::vec3& col, float smoothness = 0.0f) {
 		triangles.emplace_back(a, b, c, col, smoothness);
 	}

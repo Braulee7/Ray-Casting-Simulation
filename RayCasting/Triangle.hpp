@@ -16,6 +16,11 @@ struct Triangle : Hittable {
 
 		mMat = Material(col, smoothness);
 	}
+	
+	Triangle(glm::vec3 pointA, glm::vec3 pointB, glm::vec3 pointC, glm::vec3 normalA, glm::vec3 normalB, glm::vec3 normalC, glm::vec3 col, float smoothness = 0) 
+	: a(pointA), b(pointB), c(pointC), normA(normalA), normB(normalB), normC(normalC) {
+		mMat = Material(col, smoothness);
+	}
 	virtual bool hit(const Ray& r, float min, float max, hitInfo& rec) const override;
 
 };
