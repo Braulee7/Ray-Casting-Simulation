@@ -28,11 +28,11 @@ appreciate any feedback given on performance boosters, code readablity, and anyt
 constructive though! 
 
 # Rendered Images
-![Suzanne and Spheres] (Images/Raytracing_Scene.png)
+![Suzanne and Spheres](Images/Raytracing_Scene.png)
 
-#References
-  - ![Raytracing In One Weekend Series] (https://raytracing.github.io/books/RayTracingInOneWeekend.html)
-  - ![Sebastian Lague Raytracing Video] (https://www.youtube.com/watch?v=Qz0KTGYJtUk)
-  - ![Triangle Intersection Article] (https://www.scratchpixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection.html)
-  - ![Triangle Intersection Stackoverflow] (https://www.stackoverflow.com/questions/28165548/ray-triangle-intersection-c)
+# References
+  - ![Raytracing In One Weekend Series](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+  - ![Sebastian Lague Raytracing Video](https://www.youtube.com/watch?v=Qz0KTGYJtUk)
+  - ![Triangle Intersection Article](https://www.scratchpixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection.html)
+  - ![Triangle Intersection Stackoverflow](https://www.stackoverflow.com/questions/28165548/ray-triangle-intersection-c)
 
