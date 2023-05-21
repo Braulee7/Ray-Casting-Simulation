@@ -28,8 +28,8 @@ appreciate any feedback given on performance boosters, code readablity, and anyt
 constructive though! 
 
 # Rendered Images
-![Suzanne and Spheres](Images/Raytracing_Scene.png)* Render with before fixing triangle normals and lighting *
-![Suzanne and Spheres Fixed](Images/Braulee_RayTracing.png)* Render with fixed triangle normals and lighting * 
+![Suzanne and Spheres](Images/Raytracing_Scene.png)*Render with before fixing triangle normals and lighting*
+![Suzanne and Spheres Fixed](Images/Braulee_RayTracing.png)*Render with fixed triangle normals and lighting* 
 
 # References
   - ![Raytracing In One Weekend Series](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
