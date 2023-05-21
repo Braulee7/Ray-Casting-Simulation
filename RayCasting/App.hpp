@@ -103,6 +103,9 @@ private://variables
 	//check if user wants to multithread
 	bool multiThreading = false;
 
+	//check if random spheres should be rendered
+	bool spheres = false;
+
 
 
 private://functions
@@ -172,11 +175,16 @@ private://functions
 					<< "--scene / -s: load in a scene from a .braulee file\n"
 					<< "\tArguments: filepath to the scene file\n"
 					<< "--help / -h: bring up list of commands\n"
-					<< "--DMT: allows multithreading to be used in the rendering, speeds up processes\n";
+					<< "--DMT: allows multithreading to be used in the rendering, speeds up processes\n"
+					<< "--spheres: creates spheres around the object loaded in by file ONLY.";
 				exit(0);	//help automatically exits
 			}
 			 else if (std::string(argv[i]) == "--DMT") {
 				multiThreading = true;
+			}
+
+			 else if (std::string(argv[i]) == "--spheres") {
+				spheres = true;
 			}
 
 			/* unkown command*/
@@ -315,41 +323,69 @@ private://functions
 			}
 		}
 
-		//add random spheres around to scene
-		glm::vec3 origin, color;
-		origin.x = 0; origin.y = -100; origin.z = -10;
-		color.r = 0; color.g = 255; color.b = 0;
-		mScene.add(std::make_shared<Sphere>(origin, 100.0f, color, 0.0f));
+		if (spheres) {
+			//add random spheres around to scene
+			glm::vec3 origin, color;
+			origin.x = 0; origin.y = -100; origin.z = -10;
+			color.r = 1; color.g = 1; color.b = 1;
+			mScene.add(std::make_shared<Sphere>(origin, 100.0f, color, 1.0f));
 
-		origin.x = -2; origin.y = 1; origin.z = -1;
-		color.r = 255; color.g = color.b = 1;
-		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
-		
-		origin.x = 2; origin.y = 1; origin.z = -3;
-		color.r = 0; color.g = 0; color.b = 255;
-		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
+			origin.x = -3; origin.y = 1; origin.z = -1;
+			color.r = 255; color.g = color.b = 1;
+			mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
 
+			origin.x = 6; origin.y = 1; origin.z = -3;
+			color.r = 0; color.g = 0; color.b = 255;
+			mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
 
-		origin.y = 0; origin.z = -2;
-		color.r = 255; color.b = 255;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
-		
-		origin.x = 5;
-		color.r = 233; color.g = 122; color.b = 54;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
-		
-		origin.x = -2; origin.z = -5;
-		color.r = 23; color.g = 23; color.b = 111;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
-		
-		origin.x = -4; origin.z = -2;
-		color.r = 23; color.g = 5; color.b = 76;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
-		
-		origin.x = -3; origin.z = -2;
-		color.r = 2; color.g = 233; color.b = 200;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.25f));
+			origin.x = 3; origin.y = 0; origin.z = -1;
+			color.r = 113; color.g = 0; color.b = 111;
+			mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
 
+			origin.x = 1; origin.y = 0.25; origin.z = -1;
+			color.r = 143; color.g = 32; color.b = 43;
+			mScene.add(std::make_shared<Sphere>(origin, 0.2f, color, 1.0f));
+
+			origin.x = -4; origin.y = 0; origin.z = -3;
+			color.r = 0; color.g = 111; color.b = 255;
+			mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
+
+			origin.x = -3.25; origin.y = 0.125f; origin.z = -1;
+			color.r = 0; color.g = 100; color.b = 0;
+			mScene.add(std::make_shared<Sphere>(origin, 0.75f, color, 0.0f));
+
+			origin.x = -5.25; origin.y = 1.4f; origin.z = -1;
+			color.r = 123; color.g = 100; color.b = 14;
+			mScene.add(std::make_shared<Sphere>(origin, 0.75f, color, 0.0f));
+
+			origin.x = -2.25; origin.y = 1.4f; origin.z = -0.25f;
+			color.r = 255; color.g = 255; color.b = 255;
+			mScene.add(std::make_shared<Sphere>(origin, 0.75f, color, 0.0f));
+
+			origin.x = 2.25; origin.y = 1.4f; origin.z = -0.25f;
+			color.r = 255; color.g = 255; color.b = 255;
+			mScene.add(std::make_shared<Sphere>(origin, 0.75f, color, 1.0f));
+
+			origin.y = 0; origin.z = -2;
+			color.r = 255; color.b = 255;
+			mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+
+			origin.x = 5;
+			color.r = 233; color.g = 122; color.b = 54;
+			mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+
+			origin.x = 2; origin.z = -5;
+			color.r = 23; color.g = 23; color.b = 111;
+			mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+
+			origin.x = 4; origin.z = 0;
+			color.r = 23; color.g = 5; color.b = 76;
+			mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
+
+			origin.x = -3; origin.z = -2;
+			color.r = 2; color.g = 233; color.b = 200;
+			mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.25f));
+		}
 		mScene.add(std::make_shared<Mesh>(mesh));
 	}
 
