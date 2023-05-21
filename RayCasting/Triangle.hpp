@@ -67,7 +67,7 @@ bool Triangle::hit(const Ray& r, float min, float max, hitInfo& rec) const {
 
 		rec.hitPoint = t * r.mDirection + r.mOrigin;
 		rec.t = t;
-		rec.normal = glm::normalize(normA * w + normB * u + normC * v);
+		rec.normal = glm::normalize(normal);
 		rec.mat = mMat;
 	}
 	else return false;

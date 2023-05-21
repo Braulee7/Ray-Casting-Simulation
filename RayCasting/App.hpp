@@ -278,15 +278,21 @@ private://functions
 		
 		origin.x = 0; origin.y = 0; origin.z = -2;
 		col.x = 255; col.y = 0; col.z = 255;
-		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col));
+		mScene.add(std::make_shared<Sphere>(origin, .5f, col));
 		
 		origin.x = -2; origin.y = 0; origin.z = -2;
 		col.x = 1; col.y = 1; col.z = 5;
-		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col, 1.0f));
+		mScene.add(std::make_shared<Sphere>(origin, .5f, col, 1.0f));
 		
 		origin.x = 2; origin.y = 0; origin.z = -2;
 		col.x = 1; col.y = 1; col.z = 1;
-		mScene.add(std::make_shared<Sphere>(origin, 5.0f, col, 1.0f));
+		mScene.add(std::make_shared<Sphere>(origin, .5f, col, 1.0f));
+
+
+		glm::vec3 pointA(-1, 0, -1), pointB(0, 1, -1), pointC(1, 0, -1);
+		col.x = 255; col.y = 0; col.z = 255;
+		mScene.add(std::make_shared<Triangle>(pointA, pointB, pointC, col));
+
 	}
 
 	void BuildObj(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<int> position_index, std::vector<int> normal_index) {
@@ -296,7 +302,7 @@ private://functions
 		int count = 0;	//count to make sure we add a triangle every 3 indices
 
 		//		  position		normals			color
-		glm::vec3 triangle[3], normal[3], col(125, 23, 212);
+		glm::vec3 triangle[3] = { glm::vec3(0) }, normal[3] = { glm::vec3(0) }, col(245, 245, 220);
 
 		//use the indices to add create the mesh
 		for (int i = 0; i < position_index.size(); i++) {
@@ -305,7 +311,7 @@ private://functions
 
 			if (count > 2) {
 				count = 0;
-				mesh.Add(triangle[0], triangle[1], triangle[2], normal[0], normal[1], normal[2], col, 0.5f);
+				mesh.Add(triangle[0], triangle[1], triangle[2], normal[0], normal[1], normal[2], col);
 			}
 		}
 
@@ -315,16 +321,16 @@ private://functions
 		color.r = 0; color.g = 255; color.b = 0;
 		mScene.add(std::make_shared<Sphere>(origin, 100.0f, color, 0.0f));
 
-		origin.x = -2; origin.y = 1; origin.z = -2;
+		origin.x = -2; origin.y = 1; origin.z = -1;
 		color.r = 255; color.g = color.b = 1;
 		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
 		
-		origin.x = 2; origin.y = 1; origin.z = -2;
+		origin.x = 2; origin.y = 1; origin.z = -3;
 		color.r = 0; color.g = 0; color.b = 255;
 		mScene.add(std::make_shared<Sphere>(origin, 0.5f, color, 1.0f));
 
 
-		origin.y = 0;
+		origin.y = 0; origin.z = -2;
 		color.r = 255; color.b = 255;
 		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
 		
@@ -332,17 +338,17 @@ private://functions
 		color.r = 233; color.g = 122; color.b = 54;
 		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
 		
-		origin.x = -2;
+		origin.x = -2; origin.z = -5;
 		color.r = 23; color.g = 23; color.b = 111;
 		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
 		
-		origin.x = -4;
+		origin.x = -4; origin.z = -2;
 		color.r = 23; color.g = 5; color.b = 76;
 		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.75f));
 		
-		origin.x = -3;
-		color.r = 2; color.g = 233; color.b = 11;
-		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 1.5f));
+		origin.x = -3; origin.z = -2;
+		color.r = 2; color.g = 233; color.b = 200;
+		mScene.add(std::make_shared<Sphere>(origin, 0.55, color, 0.25f));
 
 		mScene.add(std::make_shared<Mesh>(mesh));
 	}
@@ -477,7 +483,7 @@ private://functions
 				glm::vec3 normal = rec.normal;
 
 				//calculate color color of hit object with the intensity of the light
-				float intensity = glm::max(glm::dot(normal, -mScene.mLightDirection), 0.0f);
+				float intensity = glm::max(glm::dot(normal, -mScene.mLightDirection), 0.1f);
 				glm::vec3 sphereCol = mat.mColor;
 				sphereCol *= intensity;
 				sphereCol = BU::normalize(sphereCol);
@@ -495,9 +501,7 @@ private://functions
 			}
 			else {
 				//missed so generate sky color
-				float t = 0.5 * ray.mDirection.y + 1;
-				glm::vec3 sky = (1 - t) * glm::vec3(1) + t * glm::vec3(0.5, .7f, 1);
-				sky = glm::vec3(0.6f, 0.7f, 0.9f);
+				glm::vec3 sky(0);
 				color += sky * multiplier;
 				break;
 			}
