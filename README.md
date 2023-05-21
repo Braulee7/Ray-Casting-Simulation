@@ -29,7 +29,8 @@ constructive though!
 
 # Rendered Images
 ![Suzanne and Spheres](Images/Raytracing_Scene.png)*Render with before fixing triangle normals and lighting*
-![Suzanne and Spheres Fixed](Images/Braulee_RayTracing.png)*Render with fixed triangle normals and lighting* 
+![Suzanne and Spheres Fixed](Images/Reflective_Scene.png)*Render with fixed triangle normals and lighting* 
+More renders in the Images folder
 
 # References
   - ![Raytracing In One Weekend Series](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
